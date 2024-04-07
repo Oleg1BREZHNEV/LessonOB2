@@ -1,51 +1,72 @@
 
-import tkinter as tk
+import pygame
 import random
 
-POINTS1 = 0
-POINTS2 = 0
+# Устанавливаем размеры окна и цвета
+WIDTH, HEIGHT = 800, 600
+WHITE = (255, 255, 255)
+
+# Инициализируем игру и создаем окно
+pygame.init()
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Push Off Game")
+
+# Определяем скорость движения первого объекта и начальные позиции
+speed1 = random.randint(1, 3)
+x1, y1 = 0, HEIGHT // 2
+
+# Устанавливаем количество очков и создаем текстовое отображение
+score1 = 0
+score2 = 0
+font = pygame.font.Font(None, 36)
+
+# Создаем второй объект (курсор мыши)
+x2, y2 = 0, HEIGHT // 2
+object2 = pygame.mouse.get_pos()
+
+clock = pygame.time.Clock()
+running = True
+
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    # Обновляем позицию первого объекта
+    x1 += speed1
+    if x1 >= WIDTH:
+        x1 = 0
+        score1 += 1
+
+    # Обновляем позицию второго объекта (курсор мыши)
+    x2, y2 = pygame.mouse.get_pos()
+
+    # Проверяем столкновение объектов
+    if x2 >= x1 and x2 <= x1 + 50:
+        score2 += 1
+        x1 = 0
+
+    # Очищаем экран
+    screen.fill(WHITE)
+
+    # Рисуем первый объект
+    pygame.draw.rect(screen, (255, 0, 0), (x1, y1, 50, 50))
+
+    # Отображаем количество очков для каждого объекта
+    text1 = font.render(f"Player 1 Score: {score1}", True, (0, 0, 0))
+    text2 = font.render(f"Player 2 Score: {score2}", True, (0, 0, 0))
+    screen.blit(text1, (10, HEIGHT - 40))
+    screen.blit(text2, (WIDTH - 200, HEIGHT - 40))
+
+    pygame.display.flip()
+    clock.tick(60)
+
+pygame.quit()
 
 
-def move_object1():
-    x = random.randint(0, 400)
-    y = random.randint(0, 400)
-    canvas.coords(object1, x, y, x + 20, y + 20)
-
-    if x <= 0:
-        global POINTS1
-        POINTS1 += 1
-        canvas.itemconfig(label1, text="Points: " + str(POINTS1))
-
-    root.after(1000, move_object1)
-
-
-def move_object2(event):
-    x = event.x
-    y = event.y
-    canvas.coords(object2, x, y, x + 20, y + 20)
-
-    global POINTS2
-    global POINTS1
-    if (x >= canvas.coords(object1)[0] and x <= canvas.coords(object1)[2]) and (
-            y >= canvas.coords(object1)[1] and y <= canvas.coords(object1)[3]):
-        POINTS2 += 1
-        canvas.itemconfig(label2, text="Points: " + str(POINTS2))
-
-
-root = tk.Tk()
-root.title("Objects Game")
-
-canvas = tk.Canvas(root, width=400, height=400, bg="white")
-canvas.pack()
-
-label1 = canvas.create_text(50, 380, text="Points: 0", anchor="w")
-label2 = canvas.create_text(350, 380, text="Points: 0", anchor="e")
-
-object1 = canvas.create_oval(0, 0, 20, 20, fill="red")
-object2 = canvas.create_oval(190, 190, 210, 210, fill="blue")
-
-move_object1()
-
-canvas.bind("<Motion>", move_object2)
-
-root.mainloop()
+#Этот код создает игру, в которой первый объект перемещается случайным образом
+# слева направо, а второй объект перемещается мышкой в правой части окна.
+# Если первый объект достигает левой стороны окна, второй объект получает
+# очко. Если второй объект сталкивается с первым, первый объект получает
+# очко. Количество набранных очков отображается в углах окна для каждого объекта.
+# Приятной игры!
